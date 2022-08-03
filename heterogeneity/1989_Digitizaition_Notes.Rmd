@@ -1,0 +1,176 @@
+---
+title: "1989 Digitization Process"
+author: "Kirsten Riley"
+date: "7/27/2022"
+output: 
+  pdf_document:
+    toc: true
+    toc_depth: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1989 Digitization Process
+
+This document contains the process and notes of the 1989 Digitization Process.
+
+## Prior work
+
+Kelly used Omipage to digitize the 1989 pdf from the DART_IRL folder. Given the document's size she had to do this by splitting the pdf and merging the final product together.
+
+This was then run through OCR python Script and the outcome was the file 1989_OCR_Digitized.
+
+## Prep work
+
+I made a folder in the the Python Script Folder called "1989" where I copied the Address_ID and pngwork and renamed them "Address_ID_1989" and "pngwork_1989." These two files will be modified to run the 1989_OCR_Digitized data.
+
+## Order
+
+1.  Pdf2Jpg.py (complete - Antonio/ Kelly)
+2.  OCR.py (complete - Kelly) the output for this file is a txt document. I did not re-run/ modify this script because the output has already been created -- 1989_OCR_Digitized data
+3.  pngwork (complete - Kirsten and Prof. Buzard)
+4.  Address_ID.py (need to do)
+
+## pngwork.py
+
+To get Address_Id to work for the 1989 data, I need the 1989 equivalent for cattLabs97.csv which is created by pngworks (07/25 meeting)
+
+### Lines 1 - 22
+
+**Lines 1-12** are importing the packages needed to run this script
+
+**Lines 16-18** reads in 3 files: cattell-all.dta, field.dta, Labs1998.csv
+
+> changed line 16 `cattellLabs = r"G:\MAX-Filer\Collab\Labs-kbuzard-S18\Admin\ramosRivera\T-Burk\PngData\cattell-all.dta"` to the new location `cattellLabs = r"G:\MAX-Filer\Collab\Labs-kbuzard-S18\Admin\ramosRivera\cattell-all.dta`
+>
+> changed line 17 `pngField = r"G:\MAX-Filer\Collab\Labs-kbuzard-S18\Admin\ramosRivera\T-Burk\PngData\field.dta"` to the new location `pngField = r"G:\MAX-Filer\Collab\Labs-kbuzard-S18\Admin\ramosRivera\field.dta"`
+
+#### Cattell-all.dta (line 16)
+
+Contains 18 variables: Parent ID (new) *(referring to parent facility)*, year, parent ID (Cattell original) *(referring to pdf scans parent facility ID)*, Parent name, Facility name, Facility ID (Cattell original) *(referring to pdf scans facility ID)*, Facility ID (new), zipcode *(the zipcode the facility is in)*, Facility level, user, prof, doct, tech, parent name (alternative 2), parent name (alternative 3), parent name (alternative 4), state.
+
+I checked the contents and it is all for the year 1997. **I need to find the 1989 equivalent**
+
+This file was taken from Ivan Png's website.
+
+> the 1988 data in cattell-all.dta is the equivalent to the 1989 data. Code is changed to filter out all data pertaining to 1988. This was checked by opening up and matching the 1989 pdf to the 1988 cattell-all.dta data.
+
+#### field.dta (line 17)
+
+contains 5 variables: year, id, facility, field, subfield.
+
+This only contains year 1997 and is from Ivan Png's website.
+
+The website has 4 1989 files:
+
+-   field1989_orig.dta - field_name, subfield_name, field, subfield, id, id_letter, id_num, facy, hitech, submulti.
+
+-   field1989-prep.txt
+
+-   field1989_raw.dta - field_name, subfield_name, id, facy, id_letter, id_num
+
+-   field1989.xlsx - Field, subfield, id1, id2
+
+I think field.dta is created by taking the respective year's raw.dta and some how adding the variable, year and merging the id name and letter together. Not sure how to do this in Stata.
+
+> commented out because it is not used to create cattLabs97.csv
+
+#### Labs1998.csv (line 18)
+
+This data came from the work on the published paper.
+
+**Lines 20-22** sets the local variables
+
+> Lines 18, 21, and 22 were commented out. Line 18 gives the path the name "BuzzardPoints", line 21 reads in field.dta which is not needed in this script, and Line 22 reads BuzzardPpoints into the object readBPoints. readBPoints is not used or found again in the script.
+
+### Lines 25 - 31
+
+> Background on *cattel_corr_list.dta* - Antonio found some mistakes in Ivan Png's original data. Png had an RA (Xi Xiong, xx646\@nyu.edu) fix it and emailed this file on 2/14/2021.
+
+In 1989 there were no corrected data therefore this section is not needed.
+
+**Line 25**
+
+I changed `cattLab97 = readCattell[readCattel['year'] == 1997` to `cattLab89 = readCattell[readCattel['year'] == 1989`. This creates the equivalent of cattLabs97 by selecting 1989 instead of 1997.
+
+**Line 29 - 31**
+
+reads in Png user column correction data and set the local variable corrUsrData. I changed this cluster to include the year 1989 instead of 1997.
+
+### Line 34 - 57
+
+**Line 34 - 36**
+
+This cluster codes column "ID' in png data and corrected png data to match Prof. Buzard data's cattel id structure. This changes the 'facility' column thorough the [astype()](https://www.askpython.com/python/built-in-methods/python-astype) command that enables the users to set or convert the data type of an existing data column in a dataset or a data frame.
+
+> changed years from 97 to 89.
+
+**Line 38-40**
+
+Removes '0' from the facility and replaces it with nothing using the [.loc[]](https://www.askpython.com/python-modules/pandas/python-loc-function) command. This command extracts data values from a dataset.
+
+> changed 97 to 89
+
+**Line 42 - 46**
+
+helper function to add decimal to 'id' column values.
+
+> changed 97 to 89
+
+**Line 48 - 50**
+
+creates a new column with a combination of 'ID' and 'level' this is renamed as 'BuzID' :))
+
+> changed 97 to 89
+
+**Line 52-57**
+
+removes decile for whole numbers in the new column "BuzID'
+
+> changed 97 to 89
+
+### Line 61 - 117
+
+Helper function that creates new column in cattLabs and corrUsr data to have a shared index for both.
+
+### Line 119 - 138
+
+**Line 119 - 121**
+
+creates a new column that applies the helper function, [.apply()](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html), to creates a string that can be converted to int
+
+> changed 97 to 89
+
+**Line 123 - 129**
+
+changes the data type of corr_id to int (float) using the [astype()](https://www.askpython.com/python/built-in-methods/python-astype) function.
+
+Sets index for cattLabs and corrUsr data to be new corr_id column to make indexing between both easier
+
+> changed 97 to 89
+
+**Line 132 - 138**
+
+Corrects cattLab data using corrUsr data
+
+> changed 97 to 89
+
+### Line 140 - 147
+
+**Line 140 - 142**
+
+Saves the corrected published data to a csv.
+
+> saved cattLabs89 to the 1989 folder.
+
+I stopped at line 142 after cattLabs89 was created because the rest of the script is irrelevant towards making Address_ID run on the 1989 data. The rest was deleted
+
+## Address_ID.py
+
+### Inputs 
+
+-   cattLabs89 - created but empty (read in at line 93)
+
+-   OCR_Result.txt = 1989_OCR_Digitized
